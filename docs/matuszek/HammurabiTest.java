@@ -1,4 +1,4 @@
-package hammurabi;
+package src.main.java.hammurabi;
 
 import static org.junit.Assert.*;
 

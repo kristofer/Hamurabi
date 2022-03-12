@@ -1,4 +1,4 @@
-package hammurabi;               // package declaration 
+package src.main.java.hammurabi;               // package declaration
 import java.util.InputMismatchException;
 import java.util.Random;         // imports go here
 import java.util.Scanner;
@@ -60,7 +60,7 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
             }
             bushelsPerAcre = harvestYield();
             
-            newGrain = harvest(landHeld, 0);
+            newGrain = harvest(acresToPlant);
             grainDestroyed = grainEatenByRats(grainStored);
 
             landValue = newCostOfLand();
@@ -79,10 +79,10 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
         + "We harvested %d bushels at %d bushels per acre." + newLine
         + "Rats destroyed %d bushels, leaving %d bushels in storage." + newLine
         + "The city owns %d acres of land." + newLine
-        + "Land is currently worth %d bushels per acre.";
-        System.out.println(summaryTemplate, currentYear,
+        + "Land is currently worth %d bushels per acre."+ newLine;
+        System.out.printf(summaryTemplate, currentYear,
         starved, immigrants, people, newGrain, bushelsPerAcre,
-        grainDestroyed, grainStored, landHeld,  ); 
+        grainDestroyed, grainStored, landHeld, landValue );
     }
 
     void finalSummary() {
@@ -90,16 +90,26 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
     }
 
     public int plagueDeaths(int population) {
+        if (rand.nextInt(100) < 15) {
+            return population/2;
+        }
         return 0;
     }
 
     public int starvationDeaths(int population, int bushelsFedToPeople) {
-        return 0;
+        int fedpeople = (int) Math.floor(bushelsFedToPeople/20.0);
+        return (fedpeople > population) ? population : population - fedpeople ;
     }
-    boolean uprising(int population, int howManyPeopleStarved) {return false;}
+
+    public boolean uprising(int population, int howManyPeopleStarved) {
+        if (howManyPeopleStarved/(population/1.0) > 0.45) {
+            return true;
+        }
+        return false;
+    }
 
     public int immigrants(int population, int acresOwned, int grainInStorage) {
-        return 0;
+        return (20 * acresOwned + grainInStorage) / (100 * population) + 1;
     }
 
     private int harvestYield() {
@@ -110,10 +120,18 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
 
     int bushelsUsedAsSeed = 0;
     public int harvest(int acres) {
-        return 0;
+        int yield = harvestYield();
+
+        return acres * yield;
     }
 
     public int grainEatenByRats(int bushels) {
+
+        if (rand.nextInt(100) < 40) {
+            int eatenPct = rand.nextInt(30 - 10 + 1) + 10;
+            int eatenBushels = (int) Math.floor((bushels/1.0 * eatenPct));
+            return eatenPct;
+        }
         return 0;
     }
 
