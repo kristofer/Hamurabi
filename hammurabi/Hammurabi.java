@@ -8,12 +8,6 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
     Scanner scanner = new Scanner(System.in);
     String newLine = System.getProperty("line.separator");
 
-    
-    public static void main(String[] args) { // required in every Java program
-        new Hammurabi().playGame();
-    }
-
-    void playGame() {
     // Game Variables
     /*   100 people
     *   2800 bushels of grain in storage
@@ -29,60 +23,104 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
     int currentYear = 0;
     int landToBuy = 0;
     int landToSell = 0;
-    int feedGrain = 0;
+    int bushelsFedToPeople = 0;
     int acresToPlant = 0;
 
-    while (currentYear < yearsToReign) {
-        printSummary();
+    int bushelsPerAcre = 0;
+    int newGrain = 0;
+    int immigrants = 0;
+    int starved = 0;
+    int plague = 0;
+    int grainDestroyed = 0;
+    
+    public static void main(String[] args) { // required in every Java program
+        new Hammurabi().playGame();
+    }
 
-        landToBuy = askHowManyAcresToBuy(landValue, grainStored);
-        if (landToBuy == 0) {
-            landToSell = askHowManyAcresToSell(landHeld);
+    void playGame() {
+
+        while (currentYear < yearsToReign) {
+            printSummary();
+
+            landToBuy = askHowManyAcresToBuy(landValue, grainStored);
+            if (landToBuy == 0) {
+                landToSell = askHowManyAcresToSell(landHeld);
+            }
+            bushelsFedToPeople = askHowMuchGrainToFeedPeople(grainStored);
+            acresToPlant = askHowManyAcresToPlant(landHeld, people, grainStored);
+
+            // calculate the game vars.
+            plague = plagueDeaths(people);
+            starved =  starvationDeaths(people, bushelsFedToPeople);
+            if (uprising(people, starved)) {
+                break;
+            }
+            if (starved <= 0) {
+                immigrants = immigrants(people, landHeld, grainStored);
+            }
+            bushelsPerAcre = harvestYield();
+            
+            newGrain = harvest(landHeld, 0);
+            grainDestroyed = grainEatenByRats(grainStored);
+
+            landValue = newCostOfLand();
+            currentYear++;
         }
-        feedGrain = askHowMuchGrainToFeedPeople(grainStored);
-        acresToPlant = askHowManyAcresToPlant(landHeld, people, grainStored);
+        finalSummary();
     }
-    }
+
 
     void printSummary() {
-        // O great Hammurabi!
-        // You are in year 1 of your ten year rule.
-        // In the previous year 0 people starved to death.
-        // In the previous year 5 people entered the kingdom.
-        // The population is now 100.
-        // We harvested 3000 bushels at 3 bushels per acre.
-        // Rats destroyed 200 bushels, leaving 2800 bushels in storage.
-        // The city owns 1000 acres of land.
-        // Land is currently worth 19 bushels per acre.
-    
+        String summaryTemplate = "    O great Hammurabi!" + newLine
+        + "You are in year %d of your ten year rule." + newLine
+        + "In the previous year %d people starved to death." + newLine
+        + "In the previous year %d people entered the kingdom." + newLine
+        + "The population is now %d." + newLine
+        + "We harvested %d bushels at %d bushels per acre." + newLine
+        + "Rats destroyed %d bushels, leaving %d bushels in storage." + newLine
+        + "The city owns %d acres of land." + newLine
+        + "Land is currently worth %d bushels per acre.";
+        System.out.println(summaryTemplate, currentYear,
+        starved, immigrants, people, newGrain, bushelsPerAcre,
+        grainDestroyed, grainStored, landHeld,  ); 
     }
 
     void finalSummary() {
-
+        System.out.println("You're done.");
     }
 
-    public int plagueDeaths(int i) {
+    public int plagueDeaths(int population) {
         return 0;
     }
 
-    public int starvationDeaths(int i, int j) {
+    public int starvationDeaths(int population, int bushelsFedToPeople) {
+        return 0;
+    }
+    boolean uprising(int population, int howManyPeopleStarved) {return false;}
+
+    public int immigrants(int population, int acresOwned, int grainInStorage) {
         return 0;
     }
 
-    public int immigrants(int i, int j, int k) {
+    private int harvestYield() {
+        int min = 1;
+        int max = 6;
+        return rand.nextInt(max - min + 1) + min;
+    }
+
+    int bushelsUsedAsSeed = 0;
+    public int harvest(int acres) {
         return 0;
     }
 
-    public int harvest(int i) {
-        return 0;
-    }
-
-    public int grainEatenByRats(int i) {
+    public int grainEatenByRats(int bushels) {
         return 0;
     }
 
     public int newCostOfLand() {
-        return 0;
+        int min = 17;
+        int max = 23;
+        return rand.nextInt(max - min + 1) + min;
     }
 
     //other methods go here
@@ -111,17 +149,5 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
         }
     }
     
-    String summaryTemplate() {
-        return  "    O great Hammurabi!" + newLine
-    + "You are in year %d of your ten year rule." + newLine
-    + "In the previous year %d people starved to death." + newLine
-    + "In the previous year %d people entered the kingdom." + newLine
-    + "The population is now %d." + newLine
-    + "We harvested %d bushels at %d bushels per acre." + newLine
-    + "Rats destroyed %d bushels, leaving %d bushels in storage." + newLine
-    + "The city owns %d acres of land." + newLine
-    + "Land is currently worth %d bushels per acre.";
-    }
-
 
 }
