@@ -1,9 +1,10 @@
-package src.main.java.hammurabi;
+package src.test;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import src.main.Hammurabi;
 
 public class HammurabiTest {
     
