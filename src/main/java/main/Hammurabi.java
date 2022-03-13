@@ -1,21 +1,23 @@
-package src.main.java.hammurabi;               // package declaration
+package main;
+
 import java.util.InputMismatchException;
-import java.util.Random;         // imports go here
+import java.util.Random; // imports go here
 import java.util.Scanner;
 
 import static java.lang.System.exit;
 
-public class Hammurabi {         // must save in a file named Hammurabi.java
-    Random rand = new Random();  // this is an instance variable
+public class Hammurabi { // must save in a file named Hammurabi.java
+    Random rand = new Random(); // this is an instance variable
     Scanner scanner = new Scanner(System.in);
     String newLine = System.getProperty("line.separator");
 
     // Game Variables
-    /*   100 people
-    *   2800 bushels of grain in storage
-    *   1000 acres of land
-    *   Land value is 19 bushels/acre
-    */
+    /*
+     * 100 people
+     * 2800 bushels of grain in storage
+     * 1000 acres of land
+     * Land value is 19 bushels/acre
+     */
     int people = 100;
     int grainStored = 2800;
     int landHeld = 1000;
@@ -34,7 +36,7 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
     int starved = 0;
     int plague = 0;
     int grainDestroyed = 0;
-    
+
     public static void main(String[] args) { // required in every Java program
 
         new Hammurabi().playGame();
@@ -48,91 +50,108 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
         while (currentYear < yearsToReign) {
             printSummary();
 
-            landToBuy = askHowManyAcresToBuy(landValue, grainStored);
-            landHeld += landToBuy;
-            grainStored -= (landValue+landToBuy);
+            // Ask the user for 4 input parameters.
+            {
+                landToBuy = askHowManyAcresToBuy(landValue, grainStored);
+                landHeld += landToBuy;
+                grainStored -= (landValue + landToBuy);
+            }
+
             if (landToBuy == 0) {
                 landToSell = askHowManyAcresToSell(landHeld);
                 landHeld -= landToSell;
-                grainStored += (landValue+landToSell);
+                grainStored += (landValue + landToSell);
             }
-            bushelsFedToPeople = askHowMuchGrainToFeedPeople(grainStored);
-            grainStored -= bushelsFedToPeople;
+
+            {
+                bushelsFedToPeople = askHowMuchGrainToFeedPeople(grainStored);
+                grainStored -= bushelsFedToPeople;
+            }
+
             acresToPlant = askHowManyAcresToPlant(landHeld, people, grainStored);
 
             // calculate the game vars.
-            plague = plagueDeaths(people);
-            people -= plague;
+            {
+                plague = plagueDeaths(people);
+                people -= plague;
+            }
 
-            starved =  starvationDeaths(people, bushelsFedToPeople);
-            people -= starved;
-
+            {
+                starved = starvationDeaths(people, bushelsFedToPeople);
+                people -= starved;
+            }
             if (uprising(people, starved)) {
                 System.out.println("\n\nYour Great Ridiculessness!\nThere has been a terrible uprising;"
-                        +"\nYou have been deposed as ruler. Run!\n");
+                        + "\nYou have been deposed as ruler. Run!\n");
                 fail(false);
                 break;
             }
+
             if (starved <= 0) {
                 immigrants = immigrants(people, landHeld, grainStored);
                 people += immigrants;
             }
-            bushelsPerAcre = harvestYield();
 
-            newGrain = harvest(acresToPlant);
-            grainStored += newGrain;
+            {
+                bushelsPerAcre = harvestYield();
 
-            grainDestroyed = grainEatenByRats(grainStored);
-            grainStored -= grainDestroyed;
+                newGrain = harvest(acresToPlant);
+                grainStored += newGrain;
 
+                grainDestroyed = grainEatenByRats(grainStored);
+                grainStored -= grainDestroyed;
+            }
             landValue = newCostOfLand();
             currentYear++;
         }
         finalSummary();
     }
 
-
     void printSummary() {
         String summaryTemplate = "\n\n    O great Hammurabi! I beg to report to your majesty:" + newLine
-        + "You are in year %d of your ten year rule." + newLine
-        + "In the previous year %d people starved to death." + newLine
-        + "In the previous year %d people entered the kingdom." + newLine
-        + "The population is now %d." + newLine
-        + "We harvested %d bushels at %d bushels per acre." + newLine
-        + "Rats destroyed %d bushels, leaving %d bushels in storage." + newLine
-        + "The city owns %d acres of land." + newLine
-        + "Land is currently worth %d bushels per acre."+ newLine;
+                + "You are in year %d of your ten year rule." + newLine
+                + "In the previous year %d people starved to death." + newLine
+                + "In the previous year %d people entered the kingdom." + newLine
+                + "The population is now %d." + newLine
+                + "We harvested %d bushels at %d bushels per acre." + newLine
+                + "Rats destroyed %d bushels, leaving %d bushels in storage." + newLine
+                + "The city owns %d acres of land." + newLine
+                + "Land is currently worth %d bushels per acre." + newLine;
         System.out.printf(summaryTemplate, currentYear,
-        starved, immigrants, people, newGrain, bushelsPerAcre,
-        grainDestroyed, grainStored, landHeld, landValue );
+                starved, immigrants, people, newGrain, bushelsPerAcre,
+                grainDestroyed, grainStored, landHeld, landValue);
     }
 
     void fail(boolean iQuit) {
         if (iQuit) {
-            System.out.println("Hammurabi! Your humble servant can no longer be you Grand Vizier! I QUIT You miserable ruler!");
+            System.out.println(
+                    "Hammurabi! Your humble servant can no longer be you Grand Vizier! I QUIT You miserable ruler!");
             exit(1);
         } else {
-            System.out.println("\n\nTraitor! You are banished by our people;\nMay the fleas of a thousand camels infest your blanket!");
+            System.out.println(
+                    "\n\nTraitor! You are banished by our people;\nMay the fleas of a thousand camels infest your blanket!");
         }
     }
+
     void finalSummary() {
+        printSummary();
         System.out.println("You're done.");
     }
 
     public int plagueDeaths(int population) {
         if (rand.nextInt(100) < 15) {
-            return population/2;
+            return population / 2;
         }
         return 0;
     }
 
     public int starvationDeaths(int population, int bushelsFedToPeople) {
-        int fedpeople = (int) Math.floor(bushelsFedToPeople/20.0);
-        return (fedpeople > population) ? population : population - fedpeople ;
+        int fedpeople = (int) Math.floor(bushelsFedToPeople / 20.0);
+        return (fedpeople > population) ? population : population - fedpeople;
     }
 
     public boolean uprising(int population, int howManyPeopleStarved) {
-        if (howManyPeopleStarved/(population/1.0) > 0.45) {
+        if (howManyPeopleStarved / (population / 1.0) > 0.45) {
             return true;
         }
         return false;
@@ -149,6 +168,7 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
     }
 
     int bushelsUsedAsSeed = 0;
+
     public int harvest(int acres) {
         int yield = harvestYield();
 
@@ -159,7 +179,7 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
 
         if (rand.nextInt(100) < 40) {
             int eatenPct = rand.nextInt(30 - 10 + 1) + 10;
-            int eatenBushels = (int) Math.floor((bushels/1.0 * eatenPct));
+            int eatenBushels = (int) Math.floor((bushels / 1.0 * eatenPct));
             return eatenPct;
         }
         return 0;
@@ -171,16 +191,16 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
         return rand.nextInt(max - min + 1) + min;
     }
 
-    //other methods go here
+    // other methods go here
     int askHowManyAcresToBuy(int price, int bushels) {
         int toBuy = 0;
         do {
             toBuy = getNumber("How many acres do you wish to buy? ");
-        if (toBuy < 0)
-            fail(true);
-        if (toBuy * price > bushels)
-            System.out.println("O great Hammurabi:  I beg you to reconsider, You only have\n" +
-                    bushels + " bushels of grain. So I ask you again, your Enormousness, ");
+            if (toBuy < 0)
+                fail(true);
+            if (toBuy * price > bushels)
+                System.out.println("O great Hammurabi:  I beg you to reconsider, You only have\n" +
+                        bushels + " bushels of grain. So I ask you again, your Enormousness, ");
         } while (toBuy * price > bushels);
         return toBuy;
     }
@@ -199,6 +219,7 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
 
         return toSell;
     }
+
     int askHowMuchGrainToFeedPeople(int bushels) {
         int toFeed = 0;
         do {
@@ -207,13 +228,14 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
             if (toFeed < 0)
                 fail(true);
             if (toFeed > bushels)
-                System.out.println("O great Hammurabi: Thank the gods you have me "+
-                        "to do your math for your Most Cluelessness\n"+
+                System.out.println("O great Hammurabi: Thank the gods you have me " +
+                        "to do your math for your Most Cluelessness\n" +
                         "I am clearly unable to understand your thinking. You only have " +
                         bushels + " bushels of grain, So I beg Your Obtuseness");
         } while (toFeed > bushels);
         return toFeed;
     }
+
     int askHowManyAcresToPlant(int acresOwned, int population, int bushels) {
         int toPlant;
         do {
@@ -222,16 +244,19 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
             if (toPlant < 0)
                 fail(true);
             if (toPlant > acresOwned)
-                System.out.println("Yo Not-so-Smart:  THINK AGAIN. You only have " + acresOwned + " acres. So yeah, I'm gonna ask again,");
+                System.out.println("Yo Not-so-Smart:  THINK AGAIN. You only have " + acresOwned
+                        + " acres. So yeah, I'm gonna ask again,");
             if (toPlant / 2 > bushels)
                 System.out.println("Your Forgetfulness:  Reconsider, You only have\n" +
                         bushels + " bushels of grain. So while my patience is wearing thin,");
             if (toPlant > population * 10)
-                System.out.println("Ack! No Your Confusedness, You only have" + population + "people to tend the fields. So whith great humility, I pray you to tell me,");
+                System.out.println("Ack! No Your Confusedness, You only have" + population
+                        + "people to tend the fields. So whith great humility, I pray you to tell me,");
         } while (toPlant > acresOwned || toPlant / 2 > bushels || toPlant > population * 10);
 
         return toPlant;
     }
+
     /**
      * Prints the given message (which should ask the user for some integral
      * quantity), and returns the number entered by the user. If the user's
@@ -246,12 +271,10 @@ public class Hammurabi {         // must save in a file named Hammurabi.java
             System.out.print(message);
             try {
                 return scanner.nextInt();
-            }
-            catch (InputMismatchException e) {
+            } catch (InputMismatchException e) {
                 System.out.println("\"" + scanner.next() + "\" isn't a number!");
             }
         }
     }
-    
 
 }
